@@ -1,27 +1,20 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
-import { CreateUserDto } from './user.dto';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+import { CreateUserDto, UpdateUserDto } from './user.dto';
+import type { User } from './user.model';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  private users: User[] = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
-    { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com' },
-  ];
+  constructor(private userService: UsersService) {}
 
   @Get()
   findAll(): User[] {
-    return this.users;
+    return this.userService.findAllUsers();
   }
 
   @Get(':id')
   findOne(@Param('id') id: number): User | undefined {
-    const user = this.users.find((user) => user.id === +id);
+    const user = this.userService.findUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -30,31 +23,20 @@ export class UsersController {
 
   @Post()
   create(@Body() user: CreateUserDto): User {
-    const newUser: User = {
-      ...user,
-      id: this.users.length + 1,
-    };
-    this.users.push(newUser);
-    return newUser;
+    return this.userService.createUser(user);
   }
 
   @Delete(':id')
   delete(@Param('id') id: number): void {
-    const userIndex = this.users.findIndex((user) => user.id === +id);
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    this.users.splice(userIndex, 1);
+    this.userService.deleteUser(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() user: User): User {
-    const userIndex = this.users.findIndex((user) => user.id === +id);
-    if (userIndex === -1) {
+  update(@Param('id') id: number, @Body() user: UpdateUserDto): User {
+    const updatedUser = this.userService.updateUser(id, user);
+    if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    const updatedUser = { ...this.users[userIndex], ...user };
-    this.users[userIndex] = updatedUser;
     return updatedUser;
   }
 }
