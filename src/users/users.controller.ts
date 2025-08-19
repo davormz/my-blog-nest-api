@@ -8,13 +8,13 @@ export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  findAll(): User[] {
-    return this.userService.findAllUsers();
+  async findAll(): Promise<User[]> {
+    return await this.userService.findAllUsers();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): User | undefined {
-    const user = this.userService.findUserById(id);
+  async findOne(@Param('id') id: number): Promise<User | undefined> {
+    const user = await this.userService.findUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -22,18 +22,18 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() user: CreateUserDto): User {
-    return this.userService.createUser(user);
+  async create(@Body() user: CreateUserDto): Promise<User> {
+    return await this.userService.createUser(user);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number): void {
-    this.userService.deleteUser(id);
+  async delete(@Param('id') id: number): Promise<void> {
+    await this.userService.deleteUser(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() user: UpdateUserDto): User {
-    const updatedUser = this.userService.updateUser(id, user);
+  async update(@Param('id') id: number, @Body() user: UpdateUserDto): Promise<User> {
+    const updatedUser = await this.userService.updateUser(id, user);
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

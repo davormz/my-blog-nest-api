@@ -1,47 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './user.model';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
-    { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com' },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-  findAllUsers(): User[] {
-    return this.users;
+  findAllUsers(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
-  findUserById(id: number): User | undefined {
-    return this.users.find((user) => user.id === id);
+  findUserById(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } });
   }
 
-  createUser(user: CreateUserDto): User {
-    const newUser: User = {
-      id: this.users.length + 1,
-      name: user.name,
-      email: user.email || '',
-    };
-    this.users.push(newUser);
-    return newUser;
+  createUser(user: CreateUserDto): Promise<User> {
+    const newUser = this.usersRepository.create(user);
+    return this.usersRepository.save(newUser);
   }
 
-  updateUser(id: number, user: UpdateUserDto): User | undefined {
-    const existingUser = this.findUserById(id);
-    if (existingUser) {
-      Object.assign(existingUser, user);
-      return existingUser;
-    }
-    return undefined;
+  updateUser(id: number, user: UpdateUserDto): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } }).then((existingUser) => {
+      if (existingUser) {
+        Object.assign(existingUser, user);
+        return this.usersRepository.save(existingUser);
+      }
+      return null;
+    });
   }
 
-  deleteUser(id: number): boolean {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex !== -1) {
-      this.users.splice(userIndex, 1);
-      return true;
-    }
-    return false;
+  deleteUser(id: number): Promise<boolean> {
+    return this.usersRepository.delete(id).then((result) => result.affected !== 0);
   }
 }
