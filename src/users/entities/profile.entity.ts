@@ -1,0 +1,34 @@
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, BaseEntity } from 'typeorm';
+
+@Entity('profiles')
+export class Profile extends BaseEntity {
+  @Column({ nullable: true })
+  firstName?: string;
+
+  @Column({ nullable: true })
+  lastName?: string;
+
+  @Column({ nullable: true })
+  bio?: string;
+
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @Column({ nullable: true })
+  phoneNumber?: string;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth?: Date;
+
+  @Column({ nullable: true })
+  website?: string;
+
+  @Column({ nullable: true })
+  location?: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
