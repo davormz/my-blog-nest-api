@@ -1,7 +1,7 @@
-import { Column, Entity } from 'typeorm';
-import { BaseEntity } from '../../common/entities/base.entity';
+import { BaseEntity } from 'src/common';
+import { User } from 'src/users/entities/user.entity';
+import { Column, JoinColumn, ManyToOne } from 'typeorm';
 
-@Entity({ name: 'posts' })
 export class Post extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
@@ -9,9 +9,7 @@ export class Post extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  author: string;
-
-  @Column({ type: 'boolean', default: false })
-  published: boolean;
+  @ManyToOne(() => User, (user) => user.posts, { nullable: false })
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 }
