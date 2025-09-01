@@ -1,7 +1,8 @@
-import { BaseEntity } from 'src/common';
-import { User } from 'src/users/entities/user.entity';
-import { Column, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { BaseEntity } from '../../common/entities/base.entity';
+import { Category } from './category.entity';
 
+@Entity({ name: 'posts' })
 export class Post extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
@@ -9,7 +10,17 @@ export class Post extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @ManyToOne(() => User, (user) => user.posts, { nullable: false })
-  @JoinColumn({ name: 'author_id' })
-  author: User;
+  @Column({ type: 'varchar', length: 100 })
+  author: string;
+
+  @Column({ type: 'boolean', default: false })
+  published: boolean;
+
+  @ManyToMany(() => Category, (category) => category.posts)
+  @JoinTable({
+    name: 'post_categories',
+    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+  })
+  categories: Category[];
 }
