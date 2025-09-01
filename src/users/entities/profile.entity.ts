@@ -1,4 +1,5 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, BaseEntity } from 'typeorm';
+import { Entity, Column } from 'typeorm';
+import { BaseEntity } from '../../common/entities/base.entity';
 
 @Entity('profiles')
 export class Profile extends BaseEntity {
@@ -25,10 +26,4 @@ export class Profile extends BaseEntity {
 
   @Column({ nullable: true })
   location?: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
